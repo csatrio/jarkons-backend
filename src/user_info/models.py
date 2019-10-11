@@ -170,3 +170,25 @@ class UserInfo(BaseModel):
 
     def __str__(self):
         return self.nama
+
+
+class Product(BaseModel):
+    class Meta:
+        db_table = 'products'
+        verbose_name = 'Product'
+        verbose_name_plural = 'Product'
+
+    optimize_select_related = False
+
+    nama_produk = models.CharField(max_length=255)
+    nama_perusahaan = models.CharField(max_length=255)
+    jenis_member = models.CharField(max_length=255)
+    gambar = models.ImageField(upload_to=f"docs/produk/%Y/%m/%D/", default=None, null=True, blank=True)
+    perusahaan = models.ForeignKey(UserInfo, related_name='product_list', on_delete=models.DO_NOTHING)
+
+    klasifikasi = models.ForeignKey(Klasifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
+    kualifikasi = models.ForeignKey(Kualifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
+    provinsi = models.ForeignKey(Provinsi, on_delete=models.DO_NOTHING, null=True, blank=True)
+    kabupatenkota = models.ForeignKey(KabupatenKota, on_delete=models.DO_NOTHING, null=True, blank=True)
+
+    deskripsi = BinaryTextField()
