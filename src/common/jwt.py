@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django.core import serializers
 from user_info.models import UserInfo
 
 
@@ -33,14 +32,15 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             raise InvalidToken(e.args[0])
 
         user = serializer.user
-        user_info = UserInfo.objects.filter(user_id=user.id)[0]
+        user_info = UserInfo.objects.filter(user_id=user.id)
         serializer.validated_data.update({
             'id': user.id,
-            'user_info_id': user_info.id,
+            'user_info_id': user_info[0].id if len(user_info) > 0 else -1,
             'username': user.username,
             'email': user.email,
             'is_verified': user.is_verified,
             'gold_member': user.gold_member,
+            'platinum_member': user.platinum_member,
             'first_name': user.first_name,
             'last_name': user.last_name,
             'last_login': user.last_login
