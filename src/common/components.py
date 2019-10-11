@@ -6,6 +6,7 @@ from django.db.models.query_utils import DeferredAttribute
 from django_filters import CharFilter
 from rest_framework import viewsets, generics, mixins, serializers
 from rest_framework.utils.serializer_helpers import NestedBoundField, BoundField
+from django.db.models.fields.reverse_related import ManyToOneRel
 
 import common.mixins as serializer_mixin
 import common.reflections as reflections
@@ -38,11 +39,27 @@ class BaseSerializer(serializer_mixin.UniqueFieldsMixin, serializer_mixin.Nested
         return BoundField(field, value, error)
 
 
-def nested_serializer(_model, related_fields=None):
+def get_generic_serializer(_model):
+    serializer_class_name = f"{_model.__name__}GenericSerializer"
+    serializer_attributes = {}
+    serializer_meta_attributes = {'model': _model, 'fields': '__all__', 'validators': []}
+    serializer_meta_class = reflections.create_class(f"{_model.__name__}SerializerMeta", (type,),
+                                                     serializer_meta_attributes)
+    serializer_attributes['Meta'] = serializer_meta_class
+    serializer_class = reflections.create_class(serializer_class_name, (BaseSerializer,),
+                                                serializer_attributes)
+    return serializer_class
+
+
+def nested_serializer(_model, related_fields=None, recursion_depth=[0]):
     serializer_class_name = f"{_model.__name__}Serializer"
     serializer_fields = []
     serializer_attributes = {}
     serializer_meta_attributes = {'model': _model, 'fields': serializer_fields, 'validators': []}
+    recursion_depth[0] = recursion_depth[0] + 1
+
+    if recursion_depth[0] > 3:
+        return get_generic_serializer(_model)
 
     for field_name, _type in _model.__dict__.items():
         type_class = type(_type)
@@ -65,13 +82,21 @@ def nested_serializer(_model, related_fields=None):
                 if field_type == ForeignKey:
                     if related_fields:
                         related_fields.add(f"{_model.__name__.lower()}__{field.name}")
-                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields)(
+                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields,
+                                                                          recursion_depth)(
                         allow_null=True, read_only=True)
                 if field_type == ManyToManyField:
                     if related_fields:
                         related_fields.add(f"{_model.__name__.lower()}__{field.name}")
-                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields)(many=True,
-                                                                                                         read_only=True)
+                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields,
+                                                                          recursion_depth)(many=True,
+                                                                                           read_only=True)
+                if field_type == ManyToOneRel:
+                    if related_fields:
+                        related_fields.add(f"{_model.__name__.lower()}__{field.name}")
+                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields,
+                                                                          recursion_depth)(many=True,
+                                                                                           read_only=True)
             except FieldDoesNotExist:
                 pass
 
@@ -126,11 +151,19 @@ def generic_view(_model, optimize_select_related=True):
                 related_model = field.related_model
                 related_fields.add(field.name)
                 if field_type == ForeignKey:
-                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields)(
+                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields,
+                                                                          [0, ])(
                         allow_null=True, read_only=True)
                 if field_type == ManyToManyField:
-                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields)(many=True,
-                                                                                                         read_only=True)
+                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields,
+                                                                          [0])(many=True,
+                                                                               read_only=True)
+                if field_type == ManyToOneRel:
+                    if related_fields:
+                        related_fields.add(f"{_model.__name__.lower()}__{field.name}")
+                    serializer_attributes[field_name] = nested_serializer(related_model, related_fields,
+                                                                          [0])(many=True,
+                                                                               read_only=True)
             except FieldDoesNotExist:
                 pass
 
