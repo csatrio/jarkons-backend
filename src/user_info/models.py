@@ -11,6 +11,8 @@ class Profesi(BaseModel):
         verbose_name = 'Profesi'
         verbose_name_plural = 'Profesi'
 
+    is_automatic_admin = False
+    optimize_select_related = False
     text = models.CharField(max_length=255)
 
     def __str__(self):
@@ -23,6 +25,7 @@ class Provinsi(BaseModel):
         verbose_name = 'Provinsi'
         verbose_name_plural = 'Provinsi'
 
+    optimize_select_related = False
     text = models.CharField(max_length=255)
 
     def __str__(self):
@@ -35,7 +38,24 @@ class KabupatenKota(BaseModel):
         verbose_name = 'Kabupaten Kota'
         verbose_name_plural = 'Kabupaten Kota'
 
+    optimize_select_related = False
     text = models.CharField(max_length=255)
+    provinsi = models.ForeignKey(Provinsi, related_name='kabupaten_list', on_delete=models.DO_NOTHING, default=None)
+
+    def __str__(self):
+        return self.text
+
+
+class Keahlian(BaseModel):
+    class Meta:
+        db_table = 'keahlian'
+        verbose_name = 'keahlian'
+        verbose_name_plural = 'keahlian'
+
+    is_automatic_admin = False
+    optimize_select_related = False
+    text = models.CharField(max_length=255)
+    profesi = models.ForeignKey(Profesi, related_name='keahlian_list', on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.text
@@ -47,8 +67,10 @@ class Klasifikasi(BaseModel):
         verbose_name = 'Klasifikasi'
         verbose_name_plural = 'Klasifikasi'
 
+    is_automatic_admin = False
+    optimize_select_related = False
     text = models.CharField(max_length=255)
-    profesi = models.ForeignKey(Profesi, on_delete=models.DO_NOTHING)
+    profesi = models.ForeignKey(Profesi, related_name='klasifikasi_list', on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.text
@@ -60,8 +82,10 @@ class Kualifikasi(BaseModel):
         verbose_name = 'Kualifikasi'
         verbose_name_plural = 'Kualifikasi'
 
+    is_automatic_admin = False
+    optimize_select_related = False
     text = models.CharField(max_length=255)
-    profesi = models.ForeignKey(Profesi, on_delete=models.DO_NOTHING)
+    profesi = models.ForeignKey(Profesi, related_name='kualifikasi_list', on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.text
@@ -137,6 +161,8 @@ class UserInfo(BaseModel):
                                              null=True, blank=True)
     pas_photo = models.ImageField(upload_to=f"docs/pas_photo/%Y/%m/%D/", default=None,
                                   null=True, blank=True)
+    logo_perusahaan = models.ImageField(upload_to=f"docs/logo_perusahaan/%Y/%m/%D/", default=None,
+                                        null=True, blank=True)
     selfie_dengan_identitas_diri = models.ImageField(upload_to=f"docs/selfie_dengan_identitas_diri/%Y/%m/%D/",
                                                      default=None,
                                                      null=True, blank=True)
