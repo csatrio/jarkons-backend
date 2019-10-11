@@ -18,7 +18,7 @@ from datetime import timedelta
 DEBUG = True
 
 # This allow quick development using sqlite
-USE_SQLITE = True
+USE_SQLITE = False
 
 # Prefix of your API, e.g /api
 API_PREFIX = 'api'
@@ -164,10 +164,10 @@ DATABASES = {
         else
         {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'monitoring',
-            'USER': 'postgres',
-            'PASSWORD': 'openkore',
-            'HOST': 'localhost',
+            'NAME': 'jarkons',
+            'USER': 'root',
+            'PASSWORD': 'rahasia',
+            'HOST': '103.82.240.249',
             'PORT': '5432',
         }
 }
