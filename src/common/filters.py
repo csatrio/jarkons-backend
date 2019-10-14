@@ -6,6 +6,29 @@ from django_filters import rest_framework as rest_framework_filters
 from rest_framework import filters
 
 
+# for any http query that use 'q='
+def filter_q(queryset, search_field, value):
+    if value:
+        q_parts = value.split()
+
+        # Permutation code copied from http://stackoverflow.com/a/12935562/119071
+
+        list1 = search_field
+        list2 = q_parts
+
+        perms = [zip(x, list2) for x in itertools.permutations(list1, len(list2))]
+
+        q_totals = Q()
+        for perm in perms:
+            q_part = Q()
+            for p in perm:
+                q_part = q_part & Q(**{p[0] + '__icontains': p[1]})
+            q_totals = q_totals | q_part
+
+        queryset = queryset.filter(q_totals)
+    return queryset
+
+
 class BaseDjangoFilter(filters.OrderingFilter, rest_framework_filters.FilterSet):
     text_column = ()
     id_column = 'id'
@@ -20,7 +43,7 @@ class BaseDjangoFilter(filters.OrderingFilter, rest_framework_filters.FilterSet)
         BaseDjangoFilter.delete_key_if_exists(req, 'q', 'ordering', 'page', 'format', settings.PAGE_SIZE_QUERY_PARAM)
 
         if q is not None:
-            _queryset = BaseDjangoFilter.filter_q(queryset, self.text_column, q)
+            _queryset = filter_q(queryset, self.text_column, q)
         elif req.get(self.id_column) is None:
             _queryset = BaseDjangoFilter.do_filter(req, self.text_column, queryset)
         else:
@@ -35,31 +58,8 @@ class BaseDjangoFilter(filters.OrderingFilter, rest_framework_filters.FilterSet)
 
         return _queryset
 
-    # for any http query that use 'q='
-    @staticmethod
-    def filter_q(queryset, search_field, value):
+        # for any http get query, can be used with orm flags
 
-        if value:
-            q_parts = value.split()
-
-            # Permutation code copied from http://stackoverflow.com/a/12935562/119071
-
-            list1 = search_field
-            list2 = q_parts
-
-            perms = [zip(x, list2) for x in itertools.permutations(list1, len(list2))]
-
-            q_totals = Q()
-            for perm in perms:
-                q_part = Q()
-                for p in perm:
-                    q_part = q_part & Q(**{p[0] + '__icontains': p[1]})
-                q_totals = q_totals | q_part
-
-            queryset = queryset.filter(q_totals)
-        return queryset
-
-    # for any http get query, can be used with orm flags
     @staticmethod
     def do_filter(request, params, queryset):
         filter_list = []

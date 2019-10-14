@@ -1,7 +1,5 @@
 from django.conf import settings
 from django.db import models
-
-from common.fields import BinaryTextField
 from common.models import BaseModel
 
 
@@ -13,6 +11,7 @@ class Profesi(BaseModel):
 
     is_automatic_admin = False
     optimize_select_related = False
+    serialize_list = False
     text = models.CharField(max_length=255)
 
     def __str__(self):
@@ -99,7 +98,7 @@ class PengalamanKerja(BaseModel):
 
     optimize_select_related = False
     user_info = models.ForeignKey('UserInfo', related_name='pengalaman_kerja', on_delete=models.DO_NOTHING)
-    uraian_pekerjaan = BinaryTextField(null=True, blank=True)
+    uraian_pekerjaan = models.TextField(null=True, blank=True)
     pemberi_kerja = models.CharField(max_length=255)
     tahun_pelaksanaan = models.DateField()
     nilai_kontrak = models.DecimalField(max_digits=40, decimal_places=4)
@@ -145,7 +144,7 @@ class UserInfo(BaseModel):
     bersedia_mengirim_ke_lokasi_pekerjaan = models.BooleanField(default=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='info', on_delete=models.CASCADE)
     nama = models.CharField(max_length=255)
-    no_telepon = models.IntegerField(default=0)
+    no_telepon = models.CharField(max_length=255, null=True, blank=True)
     profesi = models.ForeignKey(Profesi, on_delete=models.DO_NOTHING)
     nama_perusahaan = models.CharField(max_length=255)
     jabatan_di_perusahaan = models.CharField(max_length=255)
@@ -167,8 +166,8 @@ class UserInfo(BaseModel):
                                                      default=None,
                                                      null=True, blank=True)
 
-    masalah_yang_sering_dihadapi = BinaryTextField(null=True, blank=True)
-    bantuan_yang_dibutuhkan = BinaryTextField(null=True, blank=True)
+    masalah_yang_sering_dihadapi = models.TextField(null=True, blank=True)
+    bantuan_yang_dibutuhkan = models.TextField(null=True, blank=True)
     lat = models.DecimalField(max_digits=50, decimal_places=20, default=0, blank=True)
     long = models.DecimalField(max_digits=50, decimal_places=20, default=0, blank=True)
 
@@ -207,14 +206,14 @@ class Product(BaseModel):
     optimize_select_related = False
 
     nama_produk = models.CharField(max_length=255)
-    nama_perusahaan = models.CharField(max_length=255)
-    jenis_member = models.CharField(max_length=255)
+    # nama_perusahaan = models.CharField(max_length=255)
+    # jenis_member = models.CharField(max_length=255)
     gambar = models.ImageField(upload_to=f"docs/produk/%Y/%m/%D/", default=None, null=True, blank=True)
     perusahaan = models.ForeignKey(UserInfo, related_name='product_list', on_delete=models.DO_NOTHING)
 
-    klasifikasi = models.ForeignKey(Klasifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
-    kualifikasi = models.ForeignKey(Kualifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
-    provinsi = models.ForeignKey(Provinsi, on_delete=models.DO_NOTHING, null=True, blank=True)
-    kabupatenkota = models.ForeignKey(KabupatenKota, on_delete=models.DO_NOTHING, null=True, blank=True)
+    # klasifikasi = models.ForeignKey(Klasifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
+    # kualifikasi = models.ForeignKey(Kualifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
+    # provinsi = models.ForeignKey(Provinsi, on_delete=models.DO_NOTHING, null=True, blank=True)
+    # kabupatenkota = models.ForeignKey(KabupatenKota, on_delete=models.DO_NOTHING, null=True, blank=True)
 
-    deskripsi = BinaryTextField()
+    deskripsi = models.TextField(null=True, blank=True)

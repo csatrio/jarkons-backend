@@ -33,9 +33,16 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         user = serializer.user
         user_info = UserInfo.objects.filter(user_id=user.id)
+
+        try:
+            user_photo = user_info[0].pas_photo.url() if len(user_info) > 0 else None
+        except ValueError:
+            user_photo = None
+
         serializer.validated_data.update({
             'id': user.id,
             'user_info_id': user_info[0].id if len(user_info) > 0 else -1,
+            'pas_photo': user_photo,
             'username': user.username,
             'email': user.email,
             'is_verified': user.is_verified,
@@ -47,4 +54,3 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         })
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
-
