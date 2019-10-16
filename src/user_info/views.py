@@ -10,7 +10,7 @@ from common.filters import filter_q
 from django.contrib.auth.hashers import make_password
 from rest_framework import generics, serializers
 
-from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota
+from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota, InfoLoker
 
 
 @api_view(['POST'])
@@ -152,6 +152,36 @@ class search_produk(generics.ListAPIView):
         if q is not None:
             queryset = filter_q(queryset, ['nama_produk', 'perusahaan__nama_perusahaan', 'deskripsi'], q)
         return queryset
+
+    def get_serializer_class(self):
+        return super(generics.ListAPIView, self).get_serializer_class()
+
+
+class InfoLokerSerializer(serializers.ModelSerializer):
+    perusahaan = ProductUserInfoSerializer()
+
+    class Meta:
+        model = InfoLoker
+        fields = ('id', 'nama_pekerjaan', 'desc_pekerjaan', 'lokasi', 'perusahaan', 'end_date', 'created')
+
+
+class search_infoloker(generics.ListAPIView):
+    querydata = InfoLoker.objects.all()
+    serializer_class = InfoLokerSerializer
+
+    def get_queryset(self):
+        q = self.request.query_params.get('q')
+        query_param = build_query_param(self.request, **{
+            'nama_pekerjaan': 'nama_pekerjaan__icontains',
+            'desc_pekerjaan': 'desc_pekerjaan__icontains',
+            'nama_perusahaan': 'perusahaan__nama_perusahaan__icontains',
+            'id': 'id__iexact',
+            'lokasi': 'lokasi__icontains',
+        })
+        querydata = InfoLoker.objects.select_related('perusahaan').filter(**query_param)
+        if q is not None:
+            querydata = filter_q(querydata, ['nama_pekerjaan', 'perusahaan__nama_perusahaan', 'desc_pekerjaan', 'lokasi'], q)
+        return querydata
 
     def get_serializer_class(self):
         return super(generics.ListAPIView, self).get_serializer_class()

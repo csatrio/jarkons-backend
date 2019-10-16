@@ -1,3 +1,4 @@
+import django_mysql
 from django.conf import settings
 from django.db import models
 from common.models import BaseModel
@@ -149,7 +150,8 @@ class UserInfo(BaseModel):
     nama_perusahaan = models.CharField(max_length=255)
     jabatan_di_perusahaan = models.CharField(max_length=255)
     alamat_perusahaan = models.CharField(max_length=255)
-
+    gold_member = models.BooleanField(blank=False,null=False)
+    platinum_member = models.BooleanField(blank=False, null=False)
     provinsi = models.ForeignKey(Provinsi, on_delete=models.DO_NOTHING)
     kabupaten_kota = models.ForeignKey(KabupatenKota, on_delete=models.DO_NOTHING)
     klasifikasi = models.ForeignKey(Klasifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
@@ -217,3 +219,23 @@ class Product(BaseModel):
     # kabupatenkota = models.ForeignKey(KabupatenKota, on_delete=models.DO_NOTHING, null=True, blank=True)
 
     deskripsi = models.TextField(null=True, blank=True)
+
+
+class InfoLoker(BaseModel):
+    class Meta:
+        db_table = 'info_loker'
+        verbose_name = 'InfoLoker'
+        verbose_name_plural = 'InfoLoker'
+
+    optimize_select_related = False
+    nama_pekerjaan = models.CharField(max_length=255)
+    desc_pekerjaan = models.CharField(max_length=255)
+    lokasi = models.CharField(max_length=255)
+    perusahaan_id = models.IntegerField(null=False)
+    # perusahaan = models.ForeignKey(UserInfo, related_name='loker_list', on_delete=models.DO_NOTHING)
+    gaji = models.CharField(max_length=255)
+    end_date = models.DateTimeField(null=False)
+    keahlian = models.TextField(null=True)
+    fasilitas = models.TextField(null=True)
+    kualifikasi = models.TextField(null=True)
+

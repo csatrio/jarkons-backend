@@ -6,6 +6,7 @@ urlpatterns = [
     url('register/', register),
     url('search-perusahaan/', search_perusahaan.as_view()),
     url('search-produk/', search_produk.as_view()),
+    url('search-infoloker/', search_infoloker.as_view()),
     url('get-filters/', get_filters),
     url('registration-info', registration_info),
 ]
