@@ -43,8 +43,6 @@ class User(AbstractUser):
         verbose_name_plural = 'Appplication Users'
 
     is_verified = models.BooleanField(default=False)
-    gold_member = models.BooleanField(default=False)
-    platinum_member = models.BooleanField(default=False)
     objects = UserManager()
 
     def __str__(self):
