@@ -112,7 +112,9 @@ class search_perusahaan(generics.ListAPIView):
 
 
 class ProductUserInfoSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     nama_perusahaan = serializers.CharField()
+    logo_perusahaan = serializers.ImageField()
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -120,7 +122,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('nama_produk', 'gambar', 'deskripsi', 'perusahaan')
+        fields = ('id', 'nama_produk', 'gambar', 'deskripsi', 'perusahaan')
 
 
 class search_produk(generics.ListAPIView):

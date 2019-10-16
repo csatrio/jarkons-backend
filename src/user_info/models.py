@@ -134,6 +134,18 @@ class Material(BaseModel):
     keterangan = models.CharField(max_length=255, null=True, blank=True)
 
 
+class Lowongan(BaseModel):
+    class Meta:
+        db_table = 'lowongan'
+        verbose_name = 'Lowongan'
+        verbose_name_plural = 'Lowongan'
+
+    posisi = models.CharField(max_length=255)
+    perusahaan = models.ForeignKey('UserInfo', related_name='lowongan_list', on_delete=models.DO_NOTHING)
+    deskripsi = models.TextField(null=True, blank=True)
+    berakhir_pada = models.DateField()
+
+
 class UserInfo(BaseModel):
     class Meta:
         db_table = 'user_info'
@@ -141,7 +153,11 @@ class UserInfo(BaseModel):
         verbose_name_plural = 'Users Info'
 
     optimize_select_related = False
+
+    gold_member = models.BooleanField(default=False)
+    platinum_member = models.BooleanField(default=False)
     bersedia_mengirim_ke_lokasi_pekerjaan = models.BooleanField(default=False)
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='info', on_delete=models.CASCADE)
     nama = models.CharField(max_length=255)
     no_telepon = models.CharField(max_length=255, null=True, blank=True)
@@ -193,6 +209,11 @@ class UserInfo(BaseModel):
     surat_keterangan_kerja2 = models.FileField(upload_to='docs/surat_keterangan_kerja/%Y/%m/%D/', default=None,
                                                null=True, blank=True)
 
+    # company detail
+    kantor_cabang = models.TextField(null=True, blank=True)
+    website = models.CharField(max_length=255, null=True, blank=True)
+    rating = models.IntegerField(default=3)
+
     def __str__(self):
         return self.nama
 
@@ -206,14 +227,6 @@ class Product(BaseModel):
     optimize_select_related = False
 
     nama_produk = models.CharField(max_length=255)
-    # nama_perusahaan = models.CharField(max_length=255)
-    # jenis_member = models.CharField(max_length=255)
     gambar = models.ImageField(upload_to=f"docs/produk/%Y/%m/%D/", default=None, null=True, blank=True)
     perusahaan = models.ForeignKey(UserInfo, related_name='product_list', on_delete=models.DO_NOTHING)
-
-    # klasifikasi = models.ForeignKey(Klasifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
-    # kualifikasi = models.ForeignKey(Kualifikasi, on_delete=models.DO_NOTHING, null=True, blank=True)
-    # provinsi = models.ForeignKey(Provinsi, on_delete=models.DO_NOTHING, null=True, blank=True)
-    # kabupatenkota = models.ForeignKey(KabupatenKota, on_delete=models.DO_NOTHING, null=True, blank=True)
-
     deskripsi = models.TextField(null=True, blank=True)

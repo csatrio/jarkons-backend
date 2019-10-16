@@ -88,14 +88,14 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     model = User
     inlines = [UserInfoInline, ]
-    list_display = ['username', 'email', 'gold_member', 'is_verified']
+    list_display = ['username', 'email', 'is_verified']
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Informasi Pribadi'), {'fields': ('first_name', 'last_name', 'email')}),
         (_('Hak Akses'), {'fields': ('is_active', 'is_staff', 'is_superuser',
                                      'groups', 'user_permissions')}),
         (_('Tanggal Penting'), {'fields': ('last_login', 'date_joined')}),
-        ('Membership Dan Verifikasi', {'fields': ('gold_member', 'is_verified')}),
+        ('Membership Dan Verifikasi', {'fields': ('is_verified',)}),
     )
     pass
 
