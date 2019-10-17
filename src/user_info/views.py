@@ -1,6 +1,8 @@
 from http import HTTPStatus
 
+from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from common.jsonbody import Jsonbody
 from common.models import get_user_model
@@ -9,6 +11,7 @@ from common.components import get_generic_serializer
 from common.filters import filter_q
 from django.contrib.auth.hashers import make_password
 from rest_framework import generics, serializers
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota, InfoLoker
 
@@ -161,29 +164,60 @@ class search_produk(generics.ListAPIView):
 
 class InfoLokerSerializer(serializers.ModelSerializer):
     perusahaan = ProductUserInfoSerializer()
+    id = serializers.IntegerField()
 
     class Meta:
         model = InfoLoker
-        fields = ('id', 'nama_pekerjaan', 'desc_pekerjaan', 'lokasi', 'perusahaan', 'end_date', 'created')
+        fields = ('id', 'nama_pekerjaan', 'desc_pekerjaan', 'gaji', 'lokasi', 'perusahaan', 'end_date', 'created',
+                  'modified', 'keahlian', 'fasilitas', 'kualifikasi')
 
 
-class search_infoloker(generics.ListAPIView):
-    querydata = InfoLoker.objects.all()
-    serializer_class = InfoLokerSerializer
+class LokerInfoSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    nama_pekerjaan = serializers.CharField()
+    desc_pekerjaan = serializers.CharField()
+    lokasi = serializers.CharField()
+    gaji = serializers.CharField()
+    end_date = serializers.DateTimeField()
+    perusahaan_id = serializers.IntegerField()
 
-    def get_queryset(self):
-        q = self.request.query_params.get('q')
-        query_param = build_query_param(self.request, **{
-            'nama_pekerjaan': 'nama_pekerjaan__icontains',
-            'desc_pekerjaan': 'desc_pekerjaan__icontains',
-            'nama_perusahaan': 'perusahaan__nama_perusahaan__icontains',
-            'id': 'id__iexact',
-            'lokasi': 'lokasi__icontains',
-        })
-        querydata = InfoLoker.objects.select_related('perusahaan').filter(**query_param)
-        if q is not None:
-            querydata = filter_q(querydata, ['nama_pekerjaan', 'perusahaan__nama_perusahaan', 'desc_pekerjaan', 'lokasi'], q)
-        return querydata
+    class Meta:
+        model = InfoLoker
+        fields = ('id', 'nama_pekerjaan', 'gaji', 'desc_pekerjaan', 'lokasi', 'perusahaan_id', 'end_date', 'created',
+                  'modified', 'keahlian', 'fasilitas', 'kualifikasi')
 
-    def get_serializer_class(self):
-        return super(generics.ListAPIView, self).get_serializer_class()
+    def create(self, validated_data):
+        """
+        Create and return a new `Snippet` instance, given the validated data.
+        """
+        return InfoLoker.objects.create(**validated_data)
+
+    # def update(self, instance, validated_data):
+    #     instance.id = validated_data.get('id', instance.id)
+    #     instance.nama_pekerjaan = validated_data.get('nama_pekerjaan', instance.nama_pekerjaan)
+    #     instance.desc_pekerjaan = validated_data.get('desc_pekerjaan', instance.desc_pekerjaan)
+    #     instance.lokasi = validated_data.get('lokasi', instance.lokasi)
+    #     instance.gaji = validated_data.get('gaji', instance.gaji)
+    #     # instance.keahlian = validated_data.get('style', instance.keahlian)
+    #     instance.end_date = validated_data.get('end_date', instance.end_date)
+    #     instance.perusahaan_id = validated_data.get('perusahaan_id', instance.perusahaan_id)
+    #     instance.save()
+    #     return instance
+
+
+@api_view(['GET', 'POST'])
+def crud_info_vacancy(request):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    if request.method == 'GET':
+        snippets = InfoLoker.objects.all()
+        serializer = InfoLokerSerializer(snippets, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = LokerInfoSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)

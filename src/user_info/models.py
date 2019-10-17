@@ -212,7 +212,7 @@ class UserInfo(BaseModel):
                                                null=True, blank=True)
 
     # company detail
-    kantor_cabang = models.TextField(null=True, blank=True)
+    # kantor_cabang = models.TextField(null=True, blank=True)
     website = models.CharField(max_length=255, null=True, blank=True)
     rating = models.IntegerField(default=3)
 
@@ -244,8 +244,8 @@ class InfoLoker(BaseModel):
     nama_pekerjaan = models.CharField(max_length=255)
     desc_pekerjaan = models.CharField(max_length=255)
     lokasi = models.CharField(max_length=255)
-    # perusahaan_id = models.IntegerField(null=False)
-    perusahaan = models.ForeignKey(UserInfo, on_delete=models.SET)
+    # perusahaan_id = models.IntegerField(null=True)
+    perusahaan = models.ForeignKey(UserInfo, null=True, related_name='loker_list', on_delete=models.CASCADE)
     gaji = models.CharField(max_length=255)
     end_date = models.DateTimeField(null=False)
     keahlian = models.TextField(null=True)
