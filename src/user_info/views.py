@@ -10,7 +10,7 @@ from common.filters import filter_q
 from django.contrib.auth.hashers import make_password
 from rest_framework import generics, serializers
 
-from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota
+from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota, Lowongan
 
 
 @api_view(['POST'])
@@ -80,7 +80,7 @@ def get_filters(request):
     })
 
 
-class search_perusahaan(generics.ListAPIView):
+class SearchPerusahaan(generics.ListAPIView):
     queryset = UserInfo.objects.all()
     serializer_class = get_generic_serializer(UserInfo)
 
@@ -111,21 +111,21 @@ class search_perusahaan(generics.ListAPIView):
         return super(generics.ListAPIView, self).get_serializer_class()
 
 
-class ProductUserInfoSerializer(serializers.Serializer):
+class PerusahaanSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     nama_perusahaan = serializers.CharField()
     logo_perusahaan = serializers.ImageField()
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    perusahaan = ProductUserInfoSerializer()
+    perusahaan = PerusahaanSerializer()
 
     class Meta:
         model = Product
         fields = ('id', 'nama_produk', 'gambar', 'deskripsi', 'perusahaan')
 
 
-class search_produk(generics.ListAPIView):
+class SearchProduk(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -153,6 +153,41 @@ class search_produk(generics.ListAPIView):
         queryset = Product.objects.select_related('perusahaan').filter(**query_param)
         if q is not None:
             queryset = filter_q(queryset, ['nama_produk', 'perusahaan__nama_perusahaan', 'deskripsi'], q)
+        return queryset
+
+    def get_serializer_class(self):
+        return super(generics.ListAPIView, self).get_serializer_class()
+
+
+class LowonganSerializer(serializers.ModelSerializer):
+    perusahaan = PerusahaanSerializer()
+
+    class Meta:
+        model = Lowongan
+        fields = (
+            'id', 'perusahaan', 'posisi', 'deskripsi', 'keahlian', 'kualifikasi', 'fasilitas', 'gaji', 'berakhir_pada')
+
+
+class InfoLoker(generics.ListAPIView):
+    queryset = Lowongan.objects.all()
+    serializer_class = LowonganSerializer
+
+    def get_queryset(self):
+        q = self.request.query_params.get('q')
+        query_param = build_query_param(self.request, **{
+            'nama_produk': 'nama_produk__icontains',
+            'nama_perusahaan': 'perusahaan__nama_perusahaan__icontains',
+            'id': 'id__iexact',
+            'gajiDari': 'gaji__gte',
+            'gajiHingga': 'gaji__lte',
+            'deskripsi': 'deskripsi__icontains',
+            'keahlian': 'keahlian__icontains',
+            'kualifikasi': 'kualifikasi__icontains',
+            'fasilitas': 'fasilitas__icontains'
+        })
+        queryset = Lowongan.objects.select_related('perusahaan').filter(**query_param)
+        if q is not None:
+            queryset = filter_q(queryset, ['posisi', 'perusahaan__nama_perusahaan', 'deskripsi'], q)
         return queryset
 
     def get_serializer_class(self):

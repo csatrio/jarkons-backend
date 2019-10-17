@@ -140,10 +140,46 @@ class Lowongan(BaseModel):
         verbose_name = 'Lowongan'
         verbose_name_plural = 'Lowongan'
 
+    optimize_select_related = False
     posisi = models.CharField(max_length=255)
     perusahaan = models.ForeignKey('UserInfo', related_name='lowongan_list', on_delete=models.DO_NOTHING)
     deskripsi = models.TextField(null=True, blank=True)
+    keahlian = models.TextField(null=True, blank=True)
+    kualifikasi = models.TextField(null=True, blank=True)
+    fasilitas = models.TextField(null=True, blank=True)
+    gaji = models.DecimalField(null=True, blank=True, default=0, max_digits=20, decimal_places=4)
+
     berakhir_pada = models.DateField()
+
+
+class PersonalKontak(BaseModel):
+    class Meta:
+        db_table = 'personal_kontak'
+        verbose_name = 'Personal Kontak'
+        verbose_name_plural = 'Personal Kontak'
+
+    optimize_select_related = False
+    nama = models.CharField(max_length=255)
+    jabatan = models.CharField(max_length=255)
+    telepon = models.CharField(max_length=255)
+    hp = models.CharField(max_length=255, default=None)
+    email = models.CharField(max_length=255)
+    foto = models.ImageField(upload_to=f"docs/personal_kontak/%Y/%m/%D/", default=None, null=True, blank=True)
+    perusahaan = models.ForeignKey('UserInfo', related_name='personal_kontak', on_delete=models.DO_NOTHING)
+
+
+class KantorCabang(BaseModel):
+    class Meta:
+        db_table = 'kantor_cabang'
+        verbose_name = 'Kantor Cabang'
+        verbose_name_plural = 'Kantor Cabang'
+
+    optimize_select_related = False
+    alamat = models.CharField(max_length=255)
+    telepon = models.CharField(max_length=255)
+    fax = models.CharField(max_length=255)
+    email = models.CharField(max_length=255)
+    perusahaan = models.ForeignKey('UserInfo', related_name='kantor_cabang', on_delete=models.DO_NOTHING)
 
 
 class UserInfo(BaseModel):
@@ -210,7 +246,7 @@ class UserInfo(BaseModel):
                                                null=True, blank=True)
 
     # company detail
-    kantor_cabang = models.TextField(null=True, blank=True)
+    tentang_perusahaan = models.TextField(null=True, blank=True, default=None)
     website = models.CharField(max_length=255, null=True, blank=True)
     rating = models.IntegerField(default=3)
 
@@ -228,5 +264,5 @@ class Product(BaseModel):
 
     nama_produk = models.CharField(max_length=255)
     gambar = models.ImageField(upload_to=f"docs/produk/%Y/%m/%D/", default=None, null=True, blank=True)
-    perusahaan = models.ForeignKey(UserInfo, related_name='product_list', on_delete=models.DO_NOTHING)
+    perusahaan = models.ForeignKey(UserInfo, related_name='product_list', on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
     deskripsi = models.TextField(null=True, blank=True)
