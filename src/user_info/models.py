@@ -119,6 +119,28 @@ class AlatBerat(BaseModel):
     keterangan = models.CharField(max_length=255, null=True, blank=True)
 
 
+class CarouselImage(BaseModel):
+    class Meta:
+        db_table = 'carousel_image'
+        verbose_name = 'Carousel Image'
+        verbose_name_plural = 'Carousel Image'
+
+    gambar = models.ImageField(upload_to=f"docs/news/image/%Y/%m/%D/", default=None, null=True, blank=True)
+
+
+class Testimonial(BaseModel):
+    class Meta:
+        db_table = 'testimonial'
+        verbose_name = 'Testimonial'
+        verbose_name_plural = 'Testimonial'
+
+    nama = models.CharField(max_length=255, null=True, blank=True, default=None)
+    jabatan = models.CharField(max_length=255, null=True, blank=True, default=None)
+    perusahaan = models.CharField(max_length=255, null=True, blank=True, default=None)
+    isi = models.TextField(null=True, blank=True, default=None)
+
+
+
 class Material(BaseModel):
     class Meta:
         db_table = 'material'
@@ -266,3 +288,69 @@ class Product(BaseModel):
     gambar = models.ImageField(upload_to=f"docs/produk/%Y/%m/%D/", default=None, null=True, blank=True)
     perusahaan = models.ForeignKey(UserInfo, related_name='product_list', on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
     deskripsi = models.TextField(null=True, blank=True)
+
+
+class News(BaseModel):
+    class Meta:
+        db_table = 'news'
+        verbose_name = 'News'
+        verbose_name_plural = 'News'
+
+    optimize_select_related = False
+
+    judul = models.CharField(max_length=255)
+    deskripsi_pendek = models.CharField(max_length=255, null=True, blank=True, default=None)
+    isi = models.TextField(null=True, blank=True)
+    gambar = models.ImageField(upload_to=f"docs/news/image/%Y/%m/%D/", default=None, null=True, blank=True)
+    thumbnail = models.ImageField(upload_to=f"docs/news/thumbnail/%Y/%m/%D/", default=None, null=True, blank=True)
+    perusahaan = models.ForeignKey(UserInfo, related_name='news_list', on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+
+
+class Pengadaan(BaseModel):
+    class Meta:
+        db_table = 'pengadaan'
+        verbose_name = 'Pengadaan'
+        verbose_name_plural = 'Pengadaan'
+
+    optimize_select_related = False
+
+    judul = models.CharField(max_length=255)
+    deskripsi_pendek = models.CharField(max_length=255,null=True, blank=True, default=None)
+    isi = models.TextField(null=True, blank=True, default=None)
+    batas_akhir_penawaran = models.DateField()
+    gambar = models.ImageField(upload_to=f"docs/news/image/%Y/%m/%D/", default=None, null=True, blank=True)
+    thumbnail = models.ImageField(upload_to=f"docs/news/thumbnail/%Y/%m/%D/", default=None, null=True, blank=True)
+    nomor_pengadaan = models.CharField(max_length=255, null=True, blank=True, default=None)
+    nama_pengadaan = models.CharField(max_length=255, null=True, blank=True, default=None)
+    nama_perusahaan_unit = models.CharField(max_length=255, null=True, blank=True, default=None)
+    nilai_hps_pagu = models.DecimalField(null=True, blank=True, default=0, max_digits=20, decimal_places=4)
+    lokasi_pengumuman = models.CharField(max_length=255, null=True, blank=True, default=None)
+    kategori_pengadaan = models.CharField(max_length=255, null=True, blank=True, default=None)
+    metode_pengadaan = models.CharField(max_length=255, null=True, blank=True, default=None)
+    kualifikasi_penyedia = models.CharField(max_length=255, null=True, blank=True, default=None)
+    link = models.CharField(max_length=255, null=True, blank=True, default=None)
+
+    perusahaan = models.ForeignKey(UserInfo, related_name='pengadaan_list', on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+
+
+class Event(BaseModel):
+    class Meta:
+        db_table = 'event'
+        verbose_name = 'Event'
+        verbose_name_plural = 'Event'
+
+    optimize_select_related = False
+
+    judul = models.CharField(max_length=255)
+    deskripsi_pendek = models.CharField(max_length=255, null=True, blank=True, default=None)
+    isi = models.TextField(max_length=255, null=True, blank=True, default=None)
+    info = models.CharField(max_length=255, null=True, blank=True, default=None)
+    lokasi = models.CharField(max_length=255, null=True, blank=True, default=None)
+    penyelenggara = models.CharField(max_length=255, null=True, blank=True, default=None)
+    link = models.CharField(max_length=255, null=True, blank=True, default=None)
+    tanggal_mulai = models.DateField()
+    tanggal_selesai = models.DateField()
+    gambar = models.ImageField(upload_to=f"docs/events/image/%Y/%m/%D/", default=None, null=True, blank=True)
+    thumbnail = models.ImageField(upload_to=f"docs/events/thumbnail/%Y/%m/%D/", default=None, null=True, blank=True)
+    perusahaan = models.ForeignKey(UserInfo, related_name='event_list', on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+
