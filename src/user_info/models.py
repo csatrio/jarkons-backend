@@ -245,7 +245,7 @@ class InfoLoker(BaseModel):
     desc_pekerjaan = models.CharField(max_length=255)
     lokasi = models.CharField(max_length=255)
     # perusahaan_id = models.IntegerField(null=False)
-    perusahaan = models.ForeignKey(UserInfo, on_delete=models.DO_NOTHING)
+    perusahaan = models.ForeignKey(UserInfo, on_delete=models.SET)
     gaji = models.CharField(max_length=255)
     end_date = models.DateTimeField(null=False)
     keahlian = models.TextField(null=True)
