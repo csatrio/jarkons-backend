@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os
 import importlib
+import os
 from datetime import timedelta
 
 # SECURITY WARNING: don't run with debug turned on in production!

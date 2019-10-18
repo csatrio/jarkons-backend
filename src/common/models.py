@@ -1,7 +1,8 @@
+from django.apps import apps
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.conf import settings
-from django.apps import apps
+
 
 class RelatedManager(models.Manager):
 

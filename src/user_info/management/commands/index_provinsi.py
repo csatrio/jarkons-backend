@@ -1,6 +1,8 @@
-import os
 import json
+import os
+
 from django.core.management.base import BaseCommand
+
 from user_info.models import Provinsi, KabupatenKota
 
 

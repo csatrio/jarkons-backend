@@ -2,7 +2,6 @@ import inspect
 import json
 import sys
 
-from base import settings
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import helpers
@@ -10,13 +9,15 @@ from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR, IS_POPUP_VAR, get_content_type_for_model
 from django.contrib.admin.utils import unquote, flatten_fieldsets
+from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
 from django.db.models.fields import related_descriptors
 from django.forms import all_valid
 from django.template.response import TemplateResponse
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
-from django.core.exceptions import FieldError
+
+from base import settings
 
 
 def get_classes(_name):

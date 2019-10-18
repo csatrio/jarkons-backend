@@ -1,17 +1,15 @@
 from http import HTTPStatus
 
-from django.http import JsonResponse, HttpResponse
+from django.contrib.auth.hashers import make_password
+from rest_framework import generics, serializers
 from rest_framework.decorators import api_view
-from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+
+from common.components import get_generic_serializer
+from common.filters import filter_q
 from common.jsonbody import Jsonbody
 from common.models import get_user_model
 from common.utils import delete_keys, build_query_param
-from common.components import get_generic_serializer
-from common.filters import filter_q
-from django.contrib.auth.hashers import make_password
-from rest_framework import generics, serializers
-
 from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota, InfoLoker
 
 

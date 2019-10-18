@@ -1,12 +1,12 @@
-import django.db.models.fields.related_descriptors as related_descriptors
 import django.db.models.fields.files as file_fields
+import django.db.models.fields.related_descriptors as related_descriptors
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import CharField, ForeignKey, ManyToManyField
+from django.db.models.fields.reverse_related import ManyToOneRel
 from django.db.models.query_utils import DeferredAttribute
 from django_filters import CharFilter
 from rest_framework import viewsets, generics, mixins, serializers
 from rest_framework.utils.serializer_helpers import NestedBoundField, BoundField
-from django.db.models.fields.reverse_related import ManyToOneRel
 
 import common.mixins as serializer_mixin
 import common.reflections as reflections

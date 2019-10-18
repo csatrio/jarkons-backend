@@ -1,12 +1,12 @@
+from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import UserChangeForm as BaseUserChangeForm, UserCreationForm as BaseUserCreationForm, \
     ReadOnlyPasswordHashField
-
-from django import forms
-from .models import User
-from user_info.models import UserInfo
 from django.utils.translation import gettext_lazy as _
+
+from user_info.models import UserInfo
+from .models import User
 
 _labels = {
     'user_permissions': _('Hak Akses'),

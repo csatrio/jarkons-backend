@@ -2,10 +2,11 @@ import inspect
 import sys
 
 import django.db.models.fields.related_descriptors as related_descriptors
+from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.db.models.query_utils import DeferredAttribute
-from django import forms
+
 from common.admin import CustomForm, CustomAdmin
 
 
