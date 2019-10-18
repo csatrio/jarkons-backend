@@ -286,7 +286,7 @@ class Product(BaseModel):
 
     nama_produk = models.CharField(max_length=255)
     gambar = models.ImageField(upload_to=f"docs/produk/%Y/%m/%D/", default=None, null=True, blank=True)
-    perusahaan = models.ForeignKey(UserInfo, related_name='product_list', on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+    perusahaan = models.ForeignKey(UserInfo, related_name='product_list', on_delete=models.DO_NOTHING)
     deskripsi = models.TextField(null=True, blank=True)
 
 
@@ -353,4 +353,24 @@ class Event(BaseModel):
     gambar = models.ImageField(upload_to=f"docs/events/image/%Y/%m/%D/", default=None, null=True, blank=True)
     thumbnail = models.ImageField(upload_to=f"docs/events/thumbnail/%Y/%m/%D/", default=None, null=True, blank=True)
     perusahaan = models.ForeignKey(UserInfo, related_name='event_list', on_delete=models.DO_NOTHING, null=True, blank=True, default=None)
+
+
+
+class InfoLoker(BaseModel):
+    class Meta:
+        db_table = 'info_loker'
+        verbose_name = 'InfoLoker'
+        verbose_name_plural = 'InfoLoker'
+
+    optimize_select_related = False
+    nama_pekerjaan = models.CharField(max_length=255)
+    desc_pekerjaan = models.CharField(max_length=255)
+    lokasi = models.CharField(max_length=255)
+    # perusahaan_id = models.IntegerField(null=True)
+    perusahaan = models.ForeignKey(UserInfo, null=True, related_name='loker_list', on_delete=models.CASCADE)
+    gaji = models.CharField(max_length=255)
+    end_date = models.DateTimeField(null=False)
+    keahlian = models.TextField(null=True)
+    fasilitas = models.TextField(null=True)
+    kualifikasi = models.TextField(null=True)
 
