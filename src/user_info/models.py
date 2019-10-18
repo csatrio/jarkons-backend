@@ -156,24 +156,6 @@ class Material(BaseModel):
     keterangan = models.CharField(max_length=255, null=True, blank=True)
 
 
-class Lowongan(BaseModel):
-    class Meta:
-        db_table = 'lowongan'
-        verbose_name = 'Lowongan'
-        verbose_name_plural = 'Lowongan'
-
-    optimize_select_related = False
-    posisi = models.CharField(max_length=255)
-    perusahaan = models.ForeignKey('UserInfo', related_name='lowongan_list', on_delete=models.DO_NOTHING)
-    deskripsi = models.TextField(null=True, blank=True)
-    keahlian = models.TextField(null=True, blank=True)
-    kualifikasi = models.TextField(null=True, blank=True)
-    fasilitas = models.TextField(null=True, blank=True)
-    gaji = models.DecimalField(null=True, blank=True, default=0, max_digits=20, decimal_places=4)
-
-    berakhir_pada = models.DateField()
-
-
 class PersonalKontak(BaseModel):
     class Meta:
         db_table = 'personal_kontak'

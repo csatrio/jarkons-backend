@@ -11,10 +11,8 @@ from common.components import get_generic_serializer
 from common.filters import filter_q
 from django.contrib.auth.hashers import make_password
 from rest_framework import generics, serializers
-from django.views.decorators.csrf import csrf_exempt
 
 from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota, InfoLoker
-from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota, Lowongan
 
 
 @api_view(['POST'])
@@ -163,8 +161,8 @@ class SearchProduk(generics.ListAPIView):
         return super(generics.ListAPIView, self).get_serializer_class()
 
 
-class InfoLokerSerializer(serializers.ModelSerializer):
-    perusahaan = ProductUserInfoSerializer()
+class InfoLokerSerializerGet(serializers.ModelSerializer):
+    perusahaan = PerusahaanSerializer()
     id = serializers.IntegerField()
 
     class Meta:
@@ -173,7 +171,7 @@ class InfoLokerSerializer(serializers.ModelSerializer):
                   'modified', 'keahlian', 'fasilitas', 'kualifikasi')
 
 
-class LokerInfoSerializer(serializers.ModelSerializer):
+class InfoLokerSerializerPost(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)
     nama_pekerjaan = serializers.CharField()
     desc_pekerjaan = serializers.CharField()
@@ -193,43 +191,25 @@ class LokerInfoSerializer(serializers.ModelSerializer):
         """
         return InfoLoker.objects.create(**validated_data)
 
-    # def update(self, instance, validated_data):
-    #     instance.id = validated_data.get('id', instance.id)
-    #     instance.nama_pekerjaan = validated_data.get('nama_pekerjaan', instance.nama_pekerjaan)
-    #     instance.desc_pekerjaan = validated_data.get('desc_pekerjaan', instance.desc_pekerjaan)
-    #     instance.lokasi = validated_data.get('lokasi', instance.lokasi)
-    #     instance.gaji = validated_data.get('gaji', instance.gaji)
-    #     # instance.keahlian = validated_data.get('style', instance.keahlian)
-    #     instance.end_date = validated_data.get('end_date', instance.end_date)
-    #     instance.perusahaan_id = validated_data.get('perusahaan_id', instance.perusahaan_id)
-    #     instance.save()
-    #     return instance
 
+class CrudInfoVacancy(generics.ListAPIView):
 
-@api_view(['GET', 'POST'])
-def crud_info_vacancy(request):
-    """
-    List all code snippets, or create a new snippet.
-    """
-    if request.method == 'GET':
-
-        q = request.query_params.get('q')
-        query_param = build_query_param(request, **{
+    def get_queryset(self):
+        q = self.request.query_params.get('q')
+        query_param = build_query_param(self.request, **{
             'nama_pekerjaan': 'nama_pekerjaan__icontains',
             'desc_pekerjaan': 'desc_pekerjaan__icontains',
             'nama_perusahaan': 'perusahaan__nama_perusahaan__icontains',
             'id': 'id__iexact',
-
         })
         queryset = InfoLoker.objects.select_related('perusahaan').filter(**query_param)
         if q is not None:
             queryset = filter_q(queryset, ['nama_perkerjaan', 'perusahaan__nama_perusahaan', 'desc_pekerjaan'], q)
-        serializer = InfoLokerSerializer(queryset, many=True)
-        return Response(serializer.data)
+        return queryset
 
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = LokerInfoSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
+    def get_serializer_class(self):
+        method = self.request.method
+        if method == 'GET':
+            return InfoLokerSerializerGet
+        return InfoLokerSerializerPost
+

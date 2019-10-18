@@ -4,9 +4,9 @@ from .views import *
 url = child_url_resolver(__file__)
 urlpatterns = [
     url('register/', register),
-    url('search-perusahaan/', SearchPerusahaan.as_view()),
-    url('search-produk/', SearchProduk.as_view()),
-    url('info-loker/', crud_info_vacancy),
     url('get-filters/', get_filters),
     url('registration-info', registration_info),
+    url('search-perusahaan/', SearchPerusahaan.as_view()),
+    url('search-produk/', SearchProduk.as_view()),
+    url('info-loker/', CrudInfoVacancy.as_view()),
 ]
