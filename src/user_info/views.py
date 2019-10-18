@@ -211,8 +211,19 @@ def crud_info_vacancy(request):
     List all code snippets, or create a new snippet.
     """
     if request.method == 'GET':
-        snippets = InfoLoker.objects.all()
-        serializer = InfoLokerSerializer(snippets, many=True)
+
+        q = request.query_params.get('q')
+        query_param = build_query_param(request, **{
+            'nama_pekerjaan': 'nama_pekerjaan__icontains',
+            'desc_pekerjaan': 'desc_pekerjaan__icontains',
+            'nama_perusahaan': 'perusahaan__nama_perusahaan__icontains',
+            'id': 'id__iexact',
+
+        })
+        queryset = InfoLoker.objects.select_related('perusahaan').filter(**query_param)
+        if q is not None:
+            queryset = filter_q(queryset, ['nama_perkerjaan', 'perusahaan__nama_perusahaan', 'desc_pekerjaan'], q)
+        serializer = InfoLokerSerializer(queryset, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
