@@ -9,8 +9,8 @@ from common.components import get_generic_serializer
 from common.filters import filter_q
 from common.jsonbody import Jsonbody
 from common.models import get_user_model
-from common.utils import delete_keys, build_query_param
-from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota, InfoLoker
+from common.utils import delete_keys, build_query_param, base64_to_file, millis, save_image_field
+from .models import UserInfo, Product, Provinsi, Profesi, KabupatenKota, InfoLoker, CarouselImage
 
 
 @api_view(['POST'])
@@ -33,10 +33,17 @@ def register(request):
         'email': body.email
     })
 
-    delete_keys(body.json, 'password', 'email', 'nama')
+    pas_photo = body.pas_photo
+    logo_perusahaan = body.logo_perusahaan
+    selfie_dengan_identitas_diri = body.selfie_dengan_identitas_diri
+    delete_keys(body.json, 'password', 'email', 'nama', 'pas_photo', 'logo_perusahaan', 'selfie_dengan_identitas_diri')
     body.json['user_id'] = user.id
 
-    user_info = UserInfo.objects.create(**body.json)
+    user_info = UserInfo(**body.json)
+    save_image_field(user_info.pas_photo, pas_photo)
+    save_image_field(user_info.logo_perusahaan, logo_perusahaan)
+    save_image_field(user_info.selfie_dengan_identitas_diri, selfie_dengan_identitas_diri)
+    user_info.save()
 
     return Response({'id': user.id, 'user_info_id': user_info.id, 'nama': body.nama, 'email': body.email})
 
@@ -210,4 +217,3 @@ class CrudInfoVacancy(generics.ListAPIView):
         if method == 'GET':
             return InfoLokerSerializerGet
         return InfoLokerSerializerPost
-

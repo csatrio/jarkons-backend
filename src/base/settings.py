@@ -28,6 +28,12 @@ ADMIN_URL = 'api_admin'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MEDIA_ROOT = os.path.join(BASE_DIR.replace('src',''), 'media')
+print(MEDIA_ROOT)
+MEDIA_URL = '/media/'
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Name of application
 APP_NAME = 'Jarkons'
@@ -37,7 +43,7 @@ APP_MODULE_BASE = os.path.dirname(os.path.abspath(__file__)).replace(os.getcwd()
 # excluded module and file name pattern
 helper = importlib.import_module(f"{APP_MODULE_BASE}.settings_helper")
 
-EXCLUSION_DEBUG = [APP_MODULE_BASE, 'common', 'appuser', 'templates', 'administration', 'static', '.']
+EXCLUSION_DEBUG = [APP_MODULE_BASE, 'common', 'appuser', 'templates', 'administration', 'static', 'docs', '.']
 EXCLUSION_LIST = EXCLUSION_DEBUG if DEBUG else EXCLUSION_DEBUG + ['test']
 
 # Auto generated list of application modules
@@ -230,4 +236,5 @@ STATIC_ROOT = os.path.join('../', 'static')
 # Prevent problem with static files
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
+    os.path.join(os.path.join('..', BASE_DIR), 'media')
 ]

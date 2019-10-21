@@ -21,6 +21,7 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
 from rest_framework_simplejwt import views as jwt_views
+from django.conf.urls.static import static
 
 import common.jwt as jwt
 import common.reflections as reflections
@@ -78,4 +79,4 @@ urlpatterns = [
                   path(f"{API_PREFIX}/token/refresh/", jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
                   url(f"^{API_PREFIX}/api-auth/", include('rest_framework.urls', namespace='rest_framework')),
                   url(f"^{API_PREFIX}/", include(router.urls))
-              ] + secondary_urls
+              ] + secondary_urls + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
